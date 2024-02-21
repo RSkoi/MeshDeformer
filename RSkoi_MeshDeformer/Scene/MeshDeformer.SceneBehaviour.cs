@@ -18,6 +18,7 @@ namespace RSkoi_MeshDeformer.Scene
         private const string TARGET_DICT_NAME = "RSkoi.MeshDeformer.trackedTargets";
         private const string INPUT_DICT_NAME = "RSkoi.MeshDeformer.trackedInputs";
 
+        #region override
         protected override void OnSceneLoad(SceneOperationKind operation, ReadOnlyDictionary<int, ObjectCtrlInfo> loadedItems)
         {
             if (operation == SceneOperationKind.Clear || operation == SceneOperationKind.Load)
@@ -66,9 +67,6 @@ namespace RSkoi_MeshDeformer.Scene
         {
             base.OnObjectVisibilityToggled(objectCtrlInfo, visible);
 
-            if (!CheckForVisibility.Value)
-                return;
-
             GameObject obj = objectCtrlInfo.guideObject.transformTarget.gameObject;
 
             MeshDeformerTarget[] targets = obj.GetComponentsInChildren<MeshDeformerTarget>();
@@ -93,7 +91,9 @@ namespace RSkoi_MeshDeformer.Scene
 
             base.OnObjectsSelected(objectCtrlInfo);
         }
+        #endregion override
 
+        #region private
         private void SaveTargets(PluginData data)
         {
             Dictionary<GameObject, TrackerData> dict = [];
@@ -182,9 +182,9 @@ namespace RSkoi_MeshDeformer.Scene
 
                     foreach (TrackerDataContainer trackerData in deserializedTrackerDataDict[item.Key])
                     {
-                        // TODO: options are not loaded in, something in here is broken
-
                         Transform transform = rootItemGO.transform.Find(trackerData.rendererTransformName);
+                        if (trackerData.rendererTransformName.Equals(rootItemGO.transform.name))
+                            transform = rootItemGO.transform;
                         if (transform == null)
                             continue;
 
@@ -197,7 +197,6 @@ namespace RSkoi_MeshDeformer.Scene
                         else
                         {
                             transform.GetComponent<MeshDeformerInput>().SetOptions(trackerData.inputOptions);
-
                             if (trackerData.isDisabled)
                                 _instance.DisableTrackedInput(transform.gameObject);
                         }
@@ -205,5 +204,6 @@ namespace RSkoi_MeshDeformer.Scene
                 }    
             }
         }
+        #endregion private
     }
 }

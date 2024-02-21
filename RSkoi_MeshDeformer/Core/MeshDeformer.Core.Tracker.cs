@@ -71,7 +71,7 @@ namespace RSkoi_MeshDeformer
             if (!disabledTrackedTargets.ContainsKey(obj))
                 return;
 
-            TrackerData data = (TrackerData)disabledTrackedTargets[obj];
+            TrackerData data = disabledTrackedTargets[obj];
             trackedTargets.Add(data.obj, data);
             disabledTrackedTargets.Remove(obj);
         }
@@ -113,10 +113,10 @@ namespace RSkoi_MeshDeformer
 
         public void DisableTrackedInput(GameObject obj)
         {
-            if (!IsTrackedTarget(obj))
+            if (!IsTrackedInput(obj))
                 return;
 
-            TrackerData data = (TrackerData)trackedInputs[obj];
+            TrackerData data = trackedInputs[obj];
             disabledTrackedInputs.Add(data.obj, data);
             trackedInputs.Remove(obj);
         }

@@ -20,7 +20,7 @@ namespace RSkoi_MeshDeformer
                 if (targetGO == null)
                     continue;
 
-                if (GameObjectIsTargetInput(targetGO))
+                if (GameObjectIsTargetOrInput(targetGO))
                     continue;
 
                 SetupCollider(targetGO);
@@ -45,7 +45,7 @@ namespace RSkoi_MeshDeformer
                 if (targetGO == null)
                     continue;
 
-                if (GameObjectIsTargetInput(targetGO))
+                if (GameObjectIsTargetOrInput(targetGO))
                     continue;
 
                 SetupCollider(targetGO, true);
@@ -83,7 +83,7 @@ namespace RSkoi_MeshDeformer
             return result;
         }
 
-        public static bool GameObjectIsTargetInput(GameObject target)
+        public static bool GameObjectIsTargetOrInput(GameObject target)
         {
             return target.GetComponent<MeshDeformerTarget>() != null
                 || target.GetComponent<MeshDeformerInput>() != null;

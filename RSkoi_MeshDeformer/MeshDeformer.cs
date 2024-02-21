@@ -26,7 +26,6 @@ namespace RSkoi_MeshDeformer
         internal static MeshDeformer _instance;
 
         internal static ConfigEntry<float> UiScale { get; private set; }
-        internal static ConfigEntry<bool> CheckForVisibility { get; private set; }
         internal static ConfigEntry<KeyboardShortcut> ToggleUI { get; private set; }
         internal static ConfigEntry<KeyboardShortcut> AddTargetComponentToItems { get; private set; }
         internal static ConfigEntry<KeyboardShortcut> AddInputComponentToItems { get; private set; }
@@ -67,15 +66,6 @@ namespace RSkoi_MeshDeformer
                 new ConfigDescription("Scales the UI to given factor. Open and reopen MeshDeformer window to see the change.",
                 null,
                 new ConfigurationManagerAttributes { Order = 1 }));
-
-            CheckForVisibility = Config.Bind(
-                "Config",
-                "Check for item visibility",
-                false,
-                new ConfigDescription("Whether MeshDeformer should check for workspace item visibility changes and disable/enable input " +
-                    "and target objects when the item is turned off/on. Disabled by default for performance reasons.",
-                null,
-                new ConfigurationManagerAttributes { Order = 2 }));
 
             ToggleUI = Config.Bind(
                 "Keyboard Shortcuts",
