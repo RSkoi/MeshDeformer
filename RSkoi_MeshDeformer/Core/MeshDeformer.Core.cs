@@ -1,14 +1,18 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Studio;
 
 using RSkoi_MeshDeformer.Component;
+using static RSkoi_MeshDeformer.Scene.MeshDeformerSerializableObjects;
 
 namespace RSkoi_MeshDeformer
 {
     public partial class MeshDeformer
     {
-        public void SetupTargetObjectForDeformation(GameObject go)
+        public void SetupTargetObjectForDeformation(GameObject go, ObjectCtrlInfo obj, MeshDeformerTargetOptions options = null)
         {
+            options ??= new();
+
             List<Transform> targetTransforms = GetAllMeshTransforms(go.transform);
             foreach (Transform t in targetTransforms)
             {
@@ -21,16 +25,19 @@ namespace RSkoi_MeshDeformer
 
                 SetupCollider(targetGO);
 
-                targetGO.AddComponent<MeshDeformerTarget>();
+                MeshDeformerTarget target = targetGO.AddComponent<MeshDeformerTarget>();
+                target.SetOptions(options);
 
-                AddTrackedTarget(targetGO);
+                AddTrackedTarget(new(targetGO, obj, target));
 
                 logger.LogMessage($"Target object {t.name} setup complete");
             }
         }
 
-        public void SetupInputObjectForDeformation(GameObject go)
+        public void SetupInputObjectForDeformation(GameObject go, ObjectCtrlInfo obj, MeshDeformerInputOptions options = null)
         {
+            options ??= new();
+
             List<Transform> targetTransforms = GetAllMeshTransforms(go.transform);
             foreach (Transform t in targetTransforms)
             {
@@ -51,9 +58,10 @@ namespace RSkoi_MeshDeformer
                     targetRB.constraints = RigidbodyConstraints.FreezeAll;
                 }
 
-                targetGO.AddComponent<MeshDeformerInput>();
+                MeshDeformerInput input = targetGO.AddComponent<MeshDeformerInput>();
+                input.SetOptions(options);
 
-                AddTrackedInput(targetGO);
+                AddTrackedInput(new(targetGO, obj, input));
 
                 logger.LogMessage($"Input object {t.name} setup complete");
             }

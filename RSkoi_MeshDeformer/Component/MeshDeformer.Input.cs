@@ -1,27 +1,25 @@
-﻿using Studio;
-using UnityEngine;
+﻿using UnityEngine;
+
+using static RSkoi_MeshDeformer.Scene.MeshDeformerSerializableObjects;
 
 namespace RSkoi_MeshDeformer.Component
 {
     public class MeshDeformerInput : MonoBehaviour
     {
-        public float force = 0.02f;
-        public float forceOffset = 0.2f;
-        public float distance = 0.03f;
         public Collision collision;
-        //public LineRenderer line;
+        public readonly MeshDeformerInputOptions options = new();
 
-        public void Start()
+        public void SetOptions(MeshDeformerInputOptions options)
         {
-            /*line = gameObject.AddComponent<LineRenderer>();
-            line.startWidth = 0.015f;
-            line.endWidth = 0.015f;
-            line.useWorldSpace = false;*/
+            this.options.force = options.force;
+            this.options.forceOffset = options.forceOffset;
+            this.options.distance = options.distance;
         }
 
         public void OnCollisionStay(Collision collision)
         {
-            if (!MeshDeformer._instance.IsTrackedTarget(collision.contacts[0].otherCollider.gameObject))
+            GameObject otherGameObject = collision.contacts[0].otherCollider.gameObject;
+            if (!MeshDeformer._instance.IsTrackedTarget(otherGameObject))
                 return;
             
             // this is only relevant if the input is disabled
@@ -40,15 +38,11 @@ namespace RSkoi_MeshDeformer.Component
 
             foreach (ContactPoint contact in collision.contacts)
             {
-                //line.SetPositions([contact.point, contact.normal * contact.separation]);
+                MeshDeformerTarget deformer = MeshDeformer._instance.GetTrackedTargetData(otherGameObject).target;
 
-                MeshDeformerTarget deformer = contact.otherCollider.GetComponent<MeshDeformerTarget>();
-                if (deformer)
-                {
-                    Vector3 point = contact.point;
-                    point += contact.normal * forceOffset;
-                    deformer.AddDeformingForce(point, transform.position, force, distance);
-                }
+                Vector3 point = contact.point;
+                point += contact.normal * options.forceOffset;
+                deformer.AddDeformingForce(point, transform.position, options.force, options.distance);
             }
         }
     }

@@ -4,8 +4,8 @@ using System.Reflection;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using KKAPI.Studio;
 using Studio;
+using KKAPI.Studio;
 
 namespace RSkoi_MeshDeformer.UI
 {
@@ -27,8 +27,10 @@ namespace RSkoi_MeshDeformer.UI
             InstantiateUI();
             
             // TODO: add all event handlers for input/target buttons, entry toggles
-            // TODO: edit properties
-            // TODO: make input/target buttons not interactable if none selected
+            // TODO: edit options
+                // default value "---" if multiple entries selected with different values, cannot edit field
+                // edit options across multiple entries if value is the same
+            // TODO: make input/target buttons not interactable if no item selected in workspace
         }
 
         public static void ToggleWindow()

@@ -1,40 +1,47 @@
-﻿using RSkoi_MeshDeformer.Component;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using Studio;
+
+using RSkoi_MeshDeformer.Component;
 
 namespace RSkoi_MeshDeformer
 {
     public partial class MeshDeformer
     {
-        private readonly HashSet<GameObject> _trackedTargets = [];
-        private readonly HashSet<GameObject> _disabledTrackedTargets = [];
+        public readonly Dictionary<GameObject, TrackerData> trackedTargets = [];
+        public readonly Dictionary<GameObject, TrackerData> disabledTrackedTargets = [];
 
-        private readonly HashSet<GameObject> _trackedInputs = [];
-        private readonly HashSet<GameObject> _disabledTrackedInputs = [];
+        public readonly Dictionary<GameObject, TrackerData> trackedInputs = [];
+        public readonly Dictionary<GameObject, TrackerData> disabledTrackedInputs = [];
 
         public void ClearTracker()
         {
-            _trackedTargets.Clear();
-            _disabledTrackedTargets.Clear();
-            _trackedInputs.Clear();
-            _disabledTrackedInputs.Clear();
+            trackedTargets.Clear();
+            disabledTrackedTargets.Clear();
+            trackedInputs.Clear();
+            disabledTrackedInputs.Clear();
         }
 
         #region target
-        public bool IsTrackedTarget(GameObject obj)
+        public TrackerData GetTrackedTargetData(GameObject key)
         {
-            return _trackedTargets.Contains(obj);
+            return trackedTargets[key];
         }
 
-        public void AddTrackedTarget(GameObject obj)
+        public bool IsTrackedTarget(GameObject obj)
         {
-            _trackedTargets.Add(obj);
+            return trackedTargets.ContainsKey(obj);
+        }
+
+        public void AddTrackedTarget(TrackerData data)
+        {
+            trackedTargets.Add(data.obj, data);
         }
 
         public void RemoveTrackedTarget(GameObject obj)
         { 
-            _trackedTargets.Remove(obj);
-            _disabledTrackedTargets.Remove(obj);
+            trackedTargets.Remove(obj);
+            disabledTrackedTargets.Remove(obj);
         }
 
         public void RemoveTrackedTargets(MeshDeformerTarget[] targets)
@@ -48,8 +55,9 @@ namespace RSkoi_MeshDeformer
             if (!IsTrackedTarget(obj))
                 return;
 
-            _disabledTrackedTargets.Add(obj);
-            _trackedTargets.Remove(obj);
+            TrackerData data = trackedTargets[obj];
+            disabledTrackedTargets.Add(data.obj, data);
+            trackedTargets.Remove(obj);
         }
 
         public void DisableTrackedTargets(MeshDeformerTarget[] targets)
@@ -60,11 +68,12 @@ namespace RSkoi_MeshDeformer
 
         public void EnableTrackedTarget(GameObject obj)
         {
-            if (!_disabledTrackedTargets.Contains(obj))
+            if (!disabledTrackedTargets.ContainsKey(obj))
                 return;
 
-            _trackedTargets.Add(obj);
-            _disabledTrackedTargets.Remove(obj);
+            TrackerData data = (TrackerData)disabledTrackedTargets[obj];
+            trackedTargets.Add(data.obj, data);
+            disabledTrackedTargets.Remove(obj);
         }
 
         public void EnableTrackedTargets(MeshDeformerTarget[] targets)
@@ -75,20 +84,25 @@ namespace RSkoi_MeshDeformer
         #endregion
 
         #region input
-        public bool IsTrackedInput(GameObject obj)
+        public TrackerData GetTrackedInputData(GameObject key)
         {
-            return _trackedInputs.Contains(obj);
+            return trackedInputs[key];
         }
 
-        public void AddTrackedInput(GameObject obj)
+        public bool IsTrackedInput(GameObject obj)
         {
-            _trackedInputs.Add(obj);
+            return trackedInputs.ContainsKey(obj);
+        }
+
+        public void AddTrackedInput(TrackerData data)
+        {
+            trackedInputs.Add(data.obj, data);
         }
 
         public void RemoveTrackedInput(GameObject obj)
         {
-            _trackedInputs.Remove(obj);
-            _disabledTrackedInputs.Remove(obj);
+            trackedInputs.Remove(obj);
+            disabledTrackedInputs.Remove(obj);
         }
 
         public void RemoveTrackedInputs(MeshDeformerInput[] inputs)
@@ -102,8 +116,9 @@ namespace RSkoi_MeshDeformer
             if (!IsTrackedTarget(obj))
                 return;
 
-            _disabledTrackedInputs.Add(obj);
-            _trackedInputs.Remove(obj);
+            TrackerData data = (TrackerData)trackedInputs[obj];
+            disabledTrackedInputs.Add(data.obj, data);
+            trackedInputs.Remove(obj);
         }
 
         public void DisableTrackedInputs(MeshDeformerInput[] inputs)
@@ -114,11 +129,12 @@ namespace RSkoi_MeshDeformer
 
         public void EnableTrackedInput(GameObject obj)
         {
-            if (!_disabledTrackedInputs.Contains(obj))
+            if (!disabledTrackedInputs.ContainsKey(obj))
                 return;
 
-            _trackedInputs.Add(obj);
-            _disabledTrackedInputs.Remove(obj);
+            TrackerData data = disabledTrackedInputs[obj];
+            trackedInputs.Add(data.obj, data);
+            disabledTrackedInputs.Remove(obj);
         }
 
         public void EnableTrackedInputs(MeshDeformerInput[] inputs)
@@ -127,5 +143,27 @@ namespace RSkoi_MeshDeformer
                 EnableTrackedInput(input.gameObject);
         }
         #endregion
+
+        public class TrackerData
+        {
+            public GameObject obj;
+            public ObjectCtrlInfo objInfo;
+            public MeshDeformerInput input;
+            public MeshDeformerTarget target;
+
+            public TrackerData(GameObject obj, ObjectCtrlInfo objInfo, MeshDeformerInput input)
+            {
+                this.obj = obj;
+                this.objInfo = objInfo;
+                this.input = input;
+            }
+
+            public TrackerData(GameObject obj, ObjectCtrlInfo objInfo, MeshDeformerTarget target)
+            {
+                this.obj = obj;
+                this.objInfo = objInfo;
+                this.target = target;
+            }
+        }
     }
 }

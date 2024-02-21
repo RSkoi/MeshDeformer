@@ -109,9 +109,9 @@ namespace RSkoi_MeshDeformer
             {
                 GameObject objGO = obj.guideObject.transformTarget.gameObject;
                 if (target)
-                    SetupTargetObjectForDeformation(objGO);
+                    SetupTargetObjectForDeformation(objGO, obj);
                 else
-                    SetupInputObjectForDeformation(objGO);
+                    SetupInputObjectForDeformation(objGO, obj);
             }
         }
 

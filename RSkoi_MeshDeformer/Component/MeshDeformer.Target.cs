@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using static UnityEngine.UI.Image;
+
+using static RSkoi_MeshDeformer.Scene.MeshDeformerSerializableObjects;
 
 namespace RSkoi_MeshDeformer.Component
 {
@@ -8,13 +9,10 @@ namespace RSkoi_MeshDeformer.Component
         public Mesh deformingMesh;
         public Vector3[] originalVertices, displacedVertices;
         public Vector3[] vertexVelocities;
-        public float springForce = 20f;
-        public float damping = 5f;
-        public float uniformScale = 1f;
         public Collider collider;
-        //public LineRenderer line;
+        public readonly MeshDeformerTargetOptions options = new();
 
-        private void Start()
+        public void Start()
         {
             if (GetComponent<MeshFilter>() != null)
                 deformingMesh = GetComponent<MeshFilter>().mesh;
@@ -26,29 +24,18 @@ namespace RSkoi_MeshDeformer.Component
                 displacedVertices[i] = originalVertices[i];
             vertexVelocities = new Vector3[originalVertices.Length];
             collider = GetComponent<Collider>();
-            //line = gameObject.AddComponent<LineRenderer>();
         }
 
-        public void Update()
+        public void SetOptions(MeshDeformerTargetOptions options)
         {
-            /*if (collider is not MeshCollider meshCollider)
-                return;
-            // in local space
-            //Bounds meshBounds = deformer.deformingMesh.bounds;
-
-            // collider center, extents
-            // draw box
-
-            line.startWidth = 0.015f;
-            line.endWidth = 0.015f;
-            line.useWorldSpace = false;
-            //line.SetPositions([contact.point, contact.normal * contact.separation]);
-            line.SetPositions(vertices);*/
+            this.options.springForce = options.springForce;
+            this.options.damping = options.damping;
+            this.options.uniformScale = options.uniformScale;
         }
 
         public void FixedUpdate()
         {
-            uniformScale = transform.localScale.x;
+            options.uniformScale = transform.localScale.x;
 
             for (int i = 0; i < displacedVertices.Length; i++)
                 UpdateVertex(i);
@@ -60,11 +47,11 @@ namespace RSkoi_MeshDeformer.Component
         {
             Vector3 velocity = vertexVelocities[i];
             Vector3 displacement = displacedVertices[i] - originalVertices[i];
-            displacement *= uniformScale;
-            velocity -= displacement * springForce * Time.deltaTime;
-            velocity *= 1f - damping * Time.deltaTime;
+            displacement *= options.uniformScale;
+            velocity -= displacement * options.springForce * Time.deltaTime;
+            velocity *= 1f - options.damping * Time.deltaTime;
             vertexVelocities[i] = velocity;
-            displacedVertices[i] += velocity * (Time.deltaTime / uniformScale);
+            displacedVertices[i] += velocity * (Time.deltaTime / options.uniformScale);
         }
 
         public void AddDeformingForce(Vector3 point, Vector3 origin, float force, float distance)
@@ -80,7 +67,7 @@ namespace RSkoi_MeshDeformer.Component
             if (Vector3.Distance(transform.TransformPoint(originalVertices[i]), origin) <= distance)
             {
                 Vector3 pointToVertex = displacedVertices[i] - point;
-                pointToVertex *= uniformScale;
+                pointToVertex *= options.uniformScale;
                 float attenuatedForce = force / (1f + pointToVertex.sqrMagnitude);
                 float velocity = attenuatedForce * Time.deltaTime;
                 vertexVelocities[i] += pointToVertex.normalized * velocity;
