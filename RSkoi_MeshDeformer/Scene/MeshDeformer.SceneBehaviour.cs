@@ -187,7 +187,7 @@ namespace RSkoi_MeshDeformer.Scene
                             transform = rootItemGO.transform;
                         if (transform == null)
                             continue;
-
+                        // TODO: loading disabled objects does not add the target/input component
                         if (isTarget)
                         {
                             transform.GetComponent<MeshDeformerTarget>().SetOptions(trackerData.targetOptions);
